@@ -79,10 +79,20 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
 
         var map = this.scene.getMap();
         var manager = this.scene.managerCommand;
-        var providerWMTS = manager.getProvider(map.tiles).providerWMTS;
-
-        providerWMTS.addLayer(layer);
-        manager.addLayer(map.colorTerrain,providerWMTS);
+        var protocol = layer.protocol;
+        var providerWMTS, providerWMS;
+        
+        if(protocol.toLowerCase()=="wmts"){
+            providerWMTS = manager.getProvider(map.tiles).providerWMTS;
+            providerWMTS.addLayer(layer);
+            manager.addLayer(map.colorTerrain,providerWMTS);
+        }    
+        if(protocol.toLowerCase()=="wms"){
+            providerWMS = manager.getProvider(map.tiles).providerWMS;
+            providerWMS.addLayer(layer);
+            manager.addLayer(map.colorTerrain,providerWMS);
+        }    
+        
         map.colorTerrain.services.push(layer.id);
 
         var subLayer = new Layer();
@@ -96,6 +106,8 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         map.colorTerrain.add(subLayer);
 
     };
+
+    
 
     /**
     * Gets the minimum zoom level, i.e. level at which the view is the farthest from the ground.
@@ -256,7 +268,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
     ApiGlobe.prototype.setStreetLevelImageryOn = function(value){
 
         this.scene.setStreetLevelImageryOn(value);
-    }
+    };
 
      /**
     * Gets orientation angles of the current camera, in degrees.

@@ -39,32 +39,38 @@ define('Core/Commander/Providers/WMS_Provider', [
             this.cache = CacheRessource();
             this.ioDriverImage = new IoDriver_Image();
             this.ioDriverXML = new IoDriverXML();
-
-            this.baseUrl = options.url || "";
-            this.layer = options.layer || "";
-            this.format = defaultValue(options.format, "image/jpeg");
-            this.srs = options.srs || "";
-            this.width = defaultValue(options.width, 256);
-            this.height = defaultValue(options.height, 256);
+            this._ready       = false;
         }
 
         WMS_Provider.prototype = Object.create(Provider.prototype);
 
         WMS_Provider.prototype.constructor = WMS_Provider;
+        
+        WMS_Provider.prototype.url = function(coord) {
+            
+                var bbox = coord.minCarto.longitude + "," + coord.minCarto.latitude + "," +
+                           coord.maxCarto.longitude + "," + coord.maxCarto.latitude;
+                var url = this._url + '&bbox=' + bbox + '&crs=' + this._crs;
+                return url;    
+        };                    
 
+        WMS_Provider.prototype.addLayer = function(layer){
+            if(!layer.name)
+                throw new Error('layerName is required.');
+            
+            this._baseUrl = layer.url;
+            this._layerName = layer.name;
+            this._format = defaultValue(layer.mimeType, "image/png");
+            this._crs = defaultValue(layer.projection, "EPSG:4326");
+            this._width = defaultValue(layer.heightMapWidth, 256);
+            this._version = defaultValue(layer.version, "1.3.0");
+            this._styleName = defaultValue(layer.style, "normal");
 
-        /**
-         * Returns the url for a WMS query with the specified bounding box
-         * @param {BoundingBox} bbox: requested bounding box
-         * @returns {Object@call;create.url.url|String}
-         */
-        WMS_Provider.prototype.url = function(bbox) {
-            var url = this.baseUrl + "?LAYERS=" + this.layer + "&FORMAT=" + this.format +
-                "&SERVICE=WMS&VERSION=1.1.1" + "&REQUEST=GetMap&BBOX=" +
-                bbox.minCarto.longitude + "," + bbox.minCarto.latitude + "," +
-                bbox.maxCarto.longitude + "," + bbox.maxCarto.latitude +
-                "&WIDTH=" + this.width + "&HEIGHT=" + this.height + "&SRS=" + this.srs;
-            return url;
+            this._url =   this._baseUrl + 
+                          '?SERVICE=WMS&REQUEST=GetMap&layers=' + this._layerName + 
+                          '&version=' + this._version + 
+                          '&styles=' + this._styleName +
+                          '&format=' + this._format;
         };
 
 
@@ -96,6 +102,19 @@ define('Core/Commander/Providers/WMS_Provider', [
 
         };
 
+                /**
+         * Returns the url for a WMS query with the specified bounding box
+         * @param {BoundingBox} bbox: requested bounding box
+         * @returns {Object@call;create.url.url|String}
+         */
+        WMS_Provider.prototype.urlClouds = function(bbox) {
+            var url = this.baseUrl + "?LAYERS=" + this.layer + "&FORMAT=" + this.format +
+                "&SERVICE=WMS&VERSION=1.1.1" + "&REQUEST=GetMap&BBOX=" +
+                bbox.minCarto.longitude + "," + bbox.minCarto.latitude + "," +
+                bbox.maxCarto.longitude + "," + bbox.maxCarto.latitude +
+                "&WIDTH=" + this.width + "&HEIGHT=" + this.height + "&SRS=" + this.srs;
+            return url;
+        };
 
 
         /**
