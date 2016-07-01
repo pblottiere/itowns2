@@ -68,6 +68,7 @@ define('Globe/TileMesh', [
 
         // Layer
         this.currentElevation = -1;
+        this.layersColor = [];
         this.setDisplayed(false);
 
     }
@@ -112,6 +113,11 @@ define('Globe/TileMesh', [
 
         this.texturesNeeded += nbTexturesColor;
         this.material.setParam(paramsTextureColor);
+
+        for (var l = 0; l < paramsTextureColor.length; l++)
+        {
+            this.layersColor.push({id:paramsTextureColor[l].idLayer,sequence:l});
+        }
     };
     /**
     *
@@ -332,6 +338,77 @@ define('Globe/TileMesh', [
             this.loaded = true;
             this.parent.childrenLoaded();
         }
+    };
+
+    TileMesh.prototype.getIndexLayerColor = function(idLayer) {
+
+        for (var l = 0; l < this.layersColor.length; l++)
+            if(this.layersColor[l].id === idLayer)
+                return l;
+
+        return -1;
+    };
+
+    TileMesh.prototype.removeLayerColor = function(idLayer) {
+
+        var id = this.getIndexLayerColor(idLayer);
+
+        if(id > -1)
+        {
+
+            var nbTextures = this.material.nbLoadedTextures();
+            var iSeq = this.layersColor.sequence;
+            var sequence = [];
+            this.layersColor.splice(id,1);
+
+            for (var l = 0; l < this.layersColor.length; l++)
+            {
+                if(this.layersColor[l].sequence > iSeq)
+                    this.layersColor[l].sequence--;
+
+                sequence.push(this.layersColor[l].sequence);
+            }
+
+            this.material.removeLayerColor(id);
+            this.material.setSequence(sequence);
+
+            this.texturesNeeded -= nbTextures - this.material.nbLoadedTextures();
+        }
+
+    };
+
+    TileMesh.prototype.changeSequenceLayers = function(sequence){
+
+        if(this.layersColor < 2)
+            return;
+
+        var newSequence,layer;
+
+        if(sequence.length !== this.layersColor)
+        {
+            newSequence = sequence.slice(0);
+            var max = newSequence.length;
+
+            for (var i = 0; i < max; i++)
+            {
+                layer =  newSequence[i];
+                if (layer && this.getIndexLayerColor(layer) === -1)
+                    newSequence.splice(i,1);
+            }
+        }
+        else
+            newSequence = sequence;
+
+        var sequenceMaterial = [];
+
+        for (var l = 0; l < newSequence.length; l++)
+        {
+            var index = this.getIndexLayerColor(newSequence[l]);
+            this.layersColor[index].sequence = l;
+            sequenceMaterial[l] = index ;
+        }
+
+        this.material.setSequence(sequenceMaterial);
     };
 
     return TileMesh;
