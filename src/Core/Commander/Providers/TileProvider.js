@@ -147,17 +147,34 @@ define('Core/Commander/Providers/TileProvider', [
             tile.WMTSs = [];
 
             // TODO passer mes layers colors?
-            var paramsColor = [];
+            var paramsColorWMTS = [], paramsColorWMS = [];
 
+            var requests = [],
+             colorServicesWMTS = [],
+             colorServiceWMS   = [];
             for (var i = 0; i < colorServices.length; i++)
             {
                 var layer = map.colorTerrain.children[i];
-                var tileMT = this.providerWMTS.layersWMTS[colorServices[i]].tileMatrixSet;
+                
+                var isLayerWMTS = this.providerWMTS.layersWMTS[colorServices[i]] !== undefined ? 1 : 0;
+                
+                if(isLayerWMTS) {
+                    
+                        var tileMT = this.providerWMTS.layersWMTS[colorServices[i]].tileMatrixSet;
 
-                if(!tile.WMTSs[tileMT])
-                    tile.WMTSs[tileMT] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMT);
+                        if(!tile.WMTSs[tileMT])
+                               tile.WMTSs[tileMT] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMT);
+                        colorServicesWMTS.push(colorServices[i]);
+                        paramsColorWMTS[i] = {visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0};
 
-                 paramsColor[i] = {visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0};
+                } else{ //wms
+                    
+                        /* TODO */
+                        
+                        colorServiceWMS.push(colorServices[i]);
+                        paramsColorWMS[i] = {visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0};
+
+                }           
             }
 
             var requests = [
@@ -166,7 +183,7 @@ define('Core/Commander/Providers/TileProvider', [
 
                         this.setTextureElevation(terrain);}.bind(tile)),
 
-                    this.providerWMTS.getColorTextures(tile,colorServices,paramsColor).then(function(colorTextures){
+                    this.providerWMTS.getColorTextures(tile,colorServicesWMTS,paramsColorWMTS).then(function(colorTextures){
 
                         this.setTexturesLayer(colorTextures,1);}.bind(tile))
 

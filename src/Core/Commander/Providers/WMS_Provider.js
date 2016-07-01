@@ -81,8 +81,6 @@ define('Core/Commander/Providers/WMS_Provider', [
             this.layersWMS[layer.id] = {
                     customUrl: this._url,
                     mimetype:  this._format,
-                    tileMatrixSet: layer.wmtsOptions.tileMatrixSet,
-                    tileMatrixSetLimits: layer.tileMatrixSetLimits || 'none',
                     zoom:{min:minZoom,max:maxZoom},
                     fx : layer.version || 0.0
                 };      

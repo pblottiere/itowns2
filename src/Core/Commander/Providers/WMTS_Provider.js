@@ -355,14 +355,14 @@ define('Core/Commander/Providers/WMTS_Provider', [
             var levelParent = tile.getLevelNotDownScaled();
             return (levelParent < layer.zoom.min ? tile.level : levelParent) + (layer.tileMatrixSet === 'PM' ? 1 : 0);
 
-        }
+        };
 
         WMTS_Provider.prototype.tileInsideLimit = function(tile,layer) {
 
             //var limits = layer.tileMatrixSetLimits[tile.level];
             //!coWMTS.isInside(limits)
             return tile.level >= layer.zoom.min && tile.level <= layer.zoom.max;
-        }
+        };
 
         WMTS_Provider.prototype.getColorTextures = function(tile,layerWMTSId,params) {
 
