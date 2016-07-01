@@ -86,7 +86,9 @@ define('Core/Commander/Providers/WMS_Provider', [
                 };      
         };
 
-
+        WMS_Provider.prototype.executeCommand = function(){
+            console.log("executeCommandWMS");
+        };
         /**
          * Return url wms IR coverage
          * ex url: http://realearth.ssec.wisc.edu/api/image?products=globalir&bounds=-85,-178,85,178&width=1024&height=512

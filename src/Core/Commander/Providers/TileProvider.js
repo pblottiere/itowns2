@@ -150,8 +150,8 @@ define('Core/Commander/Providers/TileProvider', [
             var paramsColorWMTS = [], paramsColorWMS = [];
 
             var requests = [],
-             colorServicesWMTS = [],
-             colorServiceWMS   = [];
+                colorServicesWMTS = [],
+                colorServiceWMS   = [];
             for (var i = 0; i < colorServices.length; i++)
             {
                 var layer = map.colorTerrain.children[i];
