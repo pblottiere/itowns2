@@ -129,7 +129,7 @@ define('Core/Commander/Providers/WMTS_Provider', [
             if(this.layersWMTS[idLayer])
                 this.layersWMTS[idLayer] = undefined;
 
-        }
+        };
 
         WMTS_Provider.prototype.addLayer = function(layer)
         {

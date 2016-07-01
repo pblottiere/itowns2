@@ -101,10 +101,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         }    
         
         map.colorTerrain.services.push(layer.id);
-
-        providerWMTS.addLayer(layer);
-        manager.addLayer(map.colorTerrain,providerWMTS);
-        map.addColorLayer(layer.id)
+        map.addColorLayer(layer.id);
 
     };
 
