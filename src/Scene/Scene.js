@@ -111,7 +111,7 @@ define('Scene/Scene', [
 
     Scene.prototype.getEllipsoid = function(){
         return this.layers[0].node.ellipsoid;
-    }
+    };
 
     Scene.prototype.updateCamera = function() {
         for(var i = 0; i < this.layers.length; i++) {
@@ -139,7 +139,7 @@ define('Scene/Scene', [
                 {
                     this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVISE);
                     if (this.managerCommand.isFree()){
-                        this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN)
+                        this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN);
                         this.viewerDiv.dispatchEvent(event);
 
                     }

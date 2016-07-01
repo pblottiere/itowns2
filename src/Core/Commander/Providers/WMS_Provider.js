@@ -39,6 +39,9 @@ define('Core/Commander/Providers/WMS_Provider', [
             this.cache = CacheRessource();
             this.ioDriverImage = new IoDriver_Image();
             this.ioDriverXML = new IoDriverXML();
+            
+            this.layersWMS = [];
+            
             this._ready       = false;
         }
 
@@ -71,6 +74,18 @@ define('Core/Commander/Providers/WMS_Provider', [
                           '&version=' + this._version + 
                           '&styles=' + this._styleName +
                           '&format=' + this._format;
+                  
+            var maxZoom = layer.maxLevel;
+            var minZoom = 0;
+            
+            this.layersWMS[layer.id] = {
+                    customUrl: this._url,
+                    mimetype:  this._format,
+                    tileMatrixSet: layer.wmtsOptions.tileMatrixSet,
+                    tileMatrixSetLimits: layer.tileMatrixSetLimits || 'none',
+                    zoom:{min:minZoom,max:maxZoom},
+                    fx : layer.version || 0.0
+                };      
         };
 
 

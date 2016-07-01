@@ -52,13 +52,9 @@ define('Core/Commander/Providers/TileProvider', [
             this.ellipsoid = new Ellipsoid(size);
             this.providerKML = new KML_Provider(this.ellipsoid);
             this.builder = new BuilderEllipsoidTile(this.ellipsoid,this.projection);
-            /*
-             *  TODO : providerWMS should link to layer passed by addImageryLayer
-             * 
-             */
             this.providerWMS = new WMS_Provider({support :gLDebug});
-            this.providerElevationTexture = this.providerWMTS;
-            this.providerColorTexture = this.providerWMTS;
+            //this.providerElevationTexture = this.providerWMTS;
+            //this.providerColorTexture = this.providerWMTS;
 
             this.cacheGeometry = [];
             this.tree = null;
@@ -156,7 +152,7 @@ define('Core/Commander/Providers/TileProvider', [
             for (var i = 0; i < colorServices.length; i++)
             {
                 var layer = map.colorTerrain.children[i];
-                var tileMT = this.providerColorTexture.layersWMTS[colorServices[i]].tileMatrixSet;
+                var tileMT = this.providerWMTS.layersWMTS[colorServices[i]].tileMatrixSet;
 
                 if(!tile.WMTSs[tileMT])
                     tile.WMTSs[tileMT] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMT);
@@ -166,11 +162,11 @@ define('Core/Commander/Providers/TileProvider', [
 
             var requests = [
 
-                    this.providerElevationTexture.getElevationTexture(tile,elevationServices).then(function(terrain){
+                    this.providerWMTS.getElevationTexture(tile,elevationServices).then(function(terrain){
 
                         this.setTextureElevation(terrain);}.bind(tile)),
 
-                    this.providerColorTexture.getColorTextures(tile,colorServices,paramsColor).then(function(colorTextures){
+                    this.providerWMTS.getColorTextures(tile,colorServices,paramsColor).then(function(colorTextures){
 
                         this.setTexturesLayer(colorTextures,1);}.bind(tile))
 

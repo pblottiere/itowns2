@@ -86,7 +86,9 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
             providerWMTS = manager.getProvider(map.tiles).providerWMTS;
             providerWMTS.addLayer(layer);
             manager.addLayer(map.colorTerrain,providerWMTS);
-        }    
+        }
+        
+        
         if(protocol.toLowerCase()=="wms"){
             providerWMS = manager.getProvider(map.tiles).providerWMS;
             providerWMS.addLayer(layer);
