@@ -87,7 +87,7 @@ define('Core/Commander/Providers/WMS_Provider', [
         };
 
         WMS_Provider.prototype.executeCommand = function(){
-            console.log("executeCommandWMS");
+            //console.log("executeCommandWMS");
         };
         /**
          * Return url wms IR coverage

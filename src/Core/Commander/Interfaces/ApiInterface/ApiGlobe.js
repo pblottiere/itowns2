@@ -99,10 +99,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
             providerWMS.addLayer(layer);
             manager.addLayer(map.colorTerrain,providerWMS);
         }    
-        
-        map.colorTerrain.services.push(layer.id);
         map.addColorLayer(layer.id);
-
     };
 
     ApiGlobe.prototype.moveLayerUp = function(layer){
