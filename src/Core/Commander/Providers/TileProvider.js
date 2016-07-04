@@ -118,7 +118,7 @@ define('Core/Commander/Providers/TileProvider', [
             // build tile
             var geometry = undefined; //getGeometry(bbox,tileCoord);
 
-            var params = {bbox:bbox,zoom:tileCoord.zoom,segment:16,center:null,projected:null}
+            var params = {bbox:bbox,zoom:tileCoord.zoom,segment:16,center:null,projected:null};
 
             var tile = new command.type(params,this.builder);
 
@@ -151,7 +151,7 @@ define('Core/Commander/Providers/TileProvider', [
 
             var requests = [],
                 colorServicesWMTS = [],
-                colorServiceWMS   = [];
+                colorServicesWMS   = [];
             for (var i = 0; i < colorServices.length; i++)
             {
                 var layer = map.colorTerrain.children[i];
@@ -165,14 +165,14 @@ define('Core/Commander/Providers/TileProvider', [
                         if(!tile.WMTSs[tileMT])
                                tile.WMTSs[tileMT] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMT);
                         colorServicesWMTS.push(colorServices[i]);
-                        paramsColorWMTS[i] = {visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0};
+                        paramsColorWMTS.push({visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0});
 
                 } else{ //wms
                     
                         /* TODO */
                         
-                        colorServiceWMS.push(colorServices[i]);
-                        paramsColorWMS[i] = {visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0};
+                        colorServicesWMS.push(colorServices[i]);
+                        paramsColorWMS.push({visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0});
 
                 }           
             }
@@ -187,7 +187,11 @@ define('Core/Commander/Providers/TileProvider', [
 
                         this.setTexturesLayer(colorTextures,1);}.bind(tile))
 
-                    ,this.getKML(tile)
+                    ,this.getKML(tile),
+
+                    this.providerWMS.getColorTextures(tile,colorServicesWMS,paramsColorWMS).then(function(colorTextures){
+
+                        this.setTexturesLayer(colorTextures,1);}.bind(tile))
 
                 ];
 

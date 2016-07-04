@@ -49,46 +49,161 @@ define('Core/Commander/Providers/WMS_Provider', [
 
         WMS_Provider.prototype.constructor = WMS_Provider;
         
-        WMS_Provider.prototype.url = function(coord) {
-            
-                var bbox = coord.minCarto.longitude + "," + coord.minCarto.latitude + "," +
-                           coord.maxCarto.longitude + "," + coord.maxCarto.latitude;
-                var url = this._url + '&bbox=' + bbox + '&crs=' + this._crs;
-                return url;    
-        };                    
+        WMS_Provider.prototype.url = function(bbox,layerId) {
+
+            return this.customUrl(this.layersWMS[layerId].customUrl,bbox);
+
+        };
+
+        WMS_Provider.prototype.customUrl = function(url,coord)
+        {
+            var bbox = coord.minCarto.longitude + "," + coord.minCarto.latitude + "," +
+                       coord.maxCarto.longitude + "," + coord.maxCarto.latitude;
+            var urld = url.replace('%bbox',bbox.toString());
+
+            return urld;
+
+        };
+
+        WMS_Provider.prototype.removeLayer = function(idLayer)
+        {
+            if(this.layersWMS[idLayer])
+                this.layersWMS[idLayer] = undefined;
+
+        };
 
         WMS_Provider.prototype.addLayer = function(layer){
             if(!layer.name)
                 throw new Error('layerName is required.');
             
-            this._baseUrl = layer.url;
-            this._layerName = layer.name;
-            this._format = defaultValue(layer.mimeType, "image/png");
-            this._crs = defaultValue(layer.projection, "EPSG:4326");
-            this._width = defaultValue(layer.heightMapWidth, 256);
-            this._version = defaultValue(layer.version, "1.3.0");
-            this._styleName = defaultValue(layer.style, "normal");
+            var baseUrl = layer.url,
+                layerName = layer.name,
+                format = defaultValue(layer.mimeType, "image/png"),
+                crs = defaultValue(layer.projection, "EPSG:4326"),
+                width = defaultValue(layer.heightMapWidth, 256),
+                version = defaultValue(layer.version, "1.3.0"),
+                styleName = defaultValue(layer.style, "normal");
 
-            this._url =   this._baseUrl + 
-                          '?SERVICE=WMS&REQUEST=GetMap&layers=' + this._layerName + 
-                          '&version=' + this._version + 
-                          '&styles=' + this._styleName +
-                          '&format=' + this._format;
-                  
-            var maxZoom = layer.maxLevel;
-            var minZoom = 0;
-            
-            this.layersWMS[layer.id] = {
-                    customUrl: this._url,
-                    mimetype:  this._format,
-                    zoom:{min:minZoom,max:maxZoom},
-                    fx : layer.version || 0.0
-                };      
+            var newBaseUrl =   baseUrl + 
+                          '?SERVICE=WMS&REQUEST=GetMap&layers=' + layerName + 
+                          '&version=' + version + 
+                          '&styles=' + styleName +
+                          '&format=' + format + 
+                          '&bbox=%bbox'  + '&crs=' + crs;    
+
+                var maxZoom = layer.maxLevel;
+                var minZoom = layer.minLevel;
+
+                this.layersWMS[layer.id] = {
+                    customUrl: newBaseUrl,
+                    mimetype :  format,
+                    crs :   crs,
+                    width  : width,
+                    version : version, 
+                    styleName : styleName,
+                    zoom : {min:minZoom,max:maxZoom},
+                    fx : layer.fx || 0.0
+                };    
         };
 
         WMS_Provider.prototype.executeCommand = function(){
             //console.log("executeCommandWMS");
         };
+        
+        WMS_Provider.prototype.tileInsideLimit = function(tile,layer) {
+            return tile.level >= layer.zoom.min && tile.level <= layer.zoom.max;
+        };
+        
+        WMS_Provider.prototype.getColorTextures = function(tile, layerWMSId, params) {
+
+            var promises = [];
+            var paramMaterial = [];
+            if (tile.material === null) {
+                return when();
+            }
+            //ATTENTION: layerWMSId may not work here
+            var lookAtAncestor = tile.material.getLevelLayerColor(1) === -1;
+
+            for (var i = 0; i < layerWMSId.length; i++) {
+
+                var layer = this.layersWMS[layerWMSId[i]];
+
+                if (this.tileInsideLimit(tile,layer))
+                {
+                    var bbox = tile.bbox;
+
+                    if(lookAtAncestor)
+                        paramMaterial.push({tileMT:0, pit:promises.length, visible:params[i].visible, opacity:params[i].opacity, fx:layer.fx, idLayer:layerWMSId[i]});
+
+                    promises.push(this.getColorTexture(bbox,layerWMSId[i]));
+
+                }
+            }
+
+            if (lookAtAncestor)
+                tile.setParamsColor(promises.length,paramMaterial);
+
+            if (promises.length)
+                return when.all(promises);
+            else
+                return when();
+
+       };
+        
+       WMS_Provider.prototype.getColorTexture = function(bbox, layerId) {
+
+            //ATTENTION: pitch???
+            var result = {pitch : 0};
+            var url = this.url(bbox,layerId);
+
+            result.texture = this.cache.getRessource(url);
+
+            if (result.texture !== undefined) {
+                return when(result);
+            }
+            return this.ioDriverImage.read(url).then(function(image) {
+
+                var texture = this.cache.getRessource(image.src);
+
+                if(texture)
+                    result.texture = texture;
+                else
+                {
+                    result.texture = new THREE.Texture(image);
+                    result.texture.needsUpdate = true;
+                    result.texture.generateMipmaps = false;
+                    result.texture.magFilter = THREE.LinearFilter;
+                    result.texture.minFilter = THREE.LinearFilter;
+                    result.texture.anisotropy = 16;
+                    result.texture.url = url;
+                    //result.texture.level = zoom; //no zoom level in wms
+                   // result.texture.layerId = layerId;
+
+                    this.cache.addRessource(url, result.texture);
+                }
+
+                return result;
+
+            }.bind(this)).catch(function(/*reason*/) {
+                    //console.error('getColorTexture failed for url |', url, '| Reason:' + reason);
+                    result.texture = null;
+
+                    return result;
+                });
+
+        }; 
+        
+        WMS_Provider.prototype.executeCommand = function(command){
+            
+            var tile = command.requester;
+            return this.getColorTextures(tile,command.paramsFunction.layer.services).then(function(result)
+            {
+                    this.setTexturesLayer(result,1);
+            }.bind(tile));
+            
+        };
+        
+        
         /**
          * Return url wms IR coverage
          * ex url: http://realearth.ssec.wisc.edu/api/image?products=globalir&bounds=-85,-178,85,178&width=1024&height=512
