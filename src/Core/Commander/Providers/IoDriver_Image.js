@@ -44,7 +44,7 @@ define('Core/Commander/Providers/IoDriver_Image', ['Core/Commander/Providers/IoD
 
             }.bind(this), false);
 
-            image.crossOrigin = '';
+            image.crossOrigin = 'anonymous';
             image.src = url;
 
         });

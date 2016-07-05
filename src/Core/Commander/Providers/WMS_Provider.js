@@ -89,7 +89,10 @@ define('Core/Commander/Providers/WMS_Provider', [
                           '&version=' + version + 
                           '&styles=' + styleName +
                           '&format=' + format + 
-                          '&bbox=%bbox'  + '&crs=' + crs;    
+                          '&bbox=%bbox'  + 
+                          '&crs=' + crs + 
+                          "&WIDTH=" + width + 
+                          "&HEIGHT=" + width;    
 
                 var maxZoom = layer.maxLevel;
                 var minZoom = layer.minLevel;
