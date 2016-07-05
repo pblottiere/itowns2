@@ -149,7 +149,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var map = this.scene.getMap();
         var manager = this.scene.managerCommand;
         var providerWMTS = manager.getProvider(map.tiles).providerWMTS;
-        var layerWMTS = providerWMTS.layersWMTS;
+        var layerWMTS = providerWMTS.layersData;
         return layerWMTS[id].zoom.min;
     };
 
@@ -158,8 +158,8 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var map = this.scene.getMap();
         var manager = this.scene.managerCommand;
         var providerWMTS = manager.getProvider(map.tiles).providerWMTS;
-        var layersWMTS = providerWMTS.layersWMTS;
-        return layersWMTS;
+        var layersData = providerWMTS.layersData;
+        return layersData;
 
     };
 
@@ -175,7 +175,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var map = this.scene.getMap();
         var manager = this.scene.managerCommand;
         var providerWMTS = manager.getProvider(map.tiles).providerWMTS;
-        var layerWMTS = providerWMTS.layersWMTS;
+        var layerWMTS = providerWMTS.layersData;
         return layerWMTS[id].zoom.max;
     };
 
