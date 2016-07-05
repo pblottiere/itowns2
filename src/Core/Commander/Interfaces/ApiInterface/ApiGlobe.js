@@ -94,7 +94,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
 
         if(protocol.toLowerCase() === 'wmts')
             provider = this.getWMTSProvider();
-        else if(protocol.toLowerCase() === 'wmts')
+        else if(protocol.toLowerCase() === 'wms')
             provider = this.getWMSProvider();
 
         provider.addLayer(layer);

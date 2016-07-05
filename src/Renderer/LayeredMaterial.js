@@ -86,10 +86,7 @@ define('Renderer/LayeredMaterial', ['THREE',
         for (var l = 0; l < nbLayer; l++) {
 
             // WARNING TODO prevent empty slot, but it's not the solution
-<<<<<<< HEAD
 
-=======
->>>>>>> dev
             this.pitScale[l] = Array(nbSamplers).fill(vector);
             this.nbTextures[l] = 0;
         }
