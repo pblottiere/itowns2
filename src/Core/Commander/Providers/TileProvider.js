@@ -213,7 +213,7 @@ define('Core/Commander/Providers/TileProvider', [
             tile.setColorLayerParameters(paramMaterial );
             tile.texturesNeeded += textureCount;
 
-            var requests = [this.providerElevationTexture.getElevationTexture(tile,elevationServices).then(function(terrain){
+            var requests = [this.providerWMTS.getElevationTexture(tile,elevationServices).then(function(terrain){
                             this.setTextureElevation(terrain);}.bind(tile))];
 
             for (var key in providersColor)

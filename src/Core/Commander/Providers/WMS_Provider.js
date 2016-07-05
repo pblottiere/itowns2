@@ -82,13 +82,15 @@ define('Core/Commander/Providers/WMS_Provider', [
                 crs = defaultValue(layer.projection, "EPSG:4326"),
                 width = defaultValue(layer.heightMapWidth, 256),
                 version = defaultValue(layer.version, "1.3.0"),
-                styleName = defaultValue(layer.style, "normal");
+                styleName = defaultValue(layer.style, "normal"),
+                transparent = defaultValue(layer.transparent, false);
 
             var newBaseUrl =   baseUrl + 
                           '?SERVICE=WMS&REQUEST=GetMap&layers=' + layerName + 
                           '&version=' + version + 
                           '&styles=' + styleName +
                           '&format=' + format + 
+                          '&transparent=' + transparent +
                           '&bbox=%bbox'  + 
                           '&crs=' + crs + 
                           "&WIDTH=" + width + 
@@ -104,6 +106,7 @@ define('Core/Commander/Providers/WMS_Provider', [
                     width  : width,
                     version : version, 
                     styleName : styleName,
+                    transparent : transparent,
                     zoom : {min:minZoom,max:maxZoom},
                     fx : layer.fx || 0.0,
                     tileMatrixSet: 'WGS84G' //cet option pour prendre le parcours de wmts
@@ -118,15 +121,13 @@ define('Core/Commander/Providers/WMS_Provider', [
             return tile.level >= layer.zoom.min && tile.level <= layer.zoom.max;
         };
         
-        WMS_Provider.prototype.getColorTextures = function(tile, layerWMSId, params) {
+        WMS_Provider.prototype.getColorTextures = function(tile, layerWMSId) {
 
             var promises = [];
-            var paramMaterial = [];
+
             if (tile.material === null) {
                 return when();
             }
-            //ATTENTION: layerWMSId may not work here
-            var lookAtAncestor = tile.material.getLevelLayerColor(1) === -1;
 
             for (var i = 0; i < layerWMSId.length; i++) {
 
@@ -135,17 +136,9 @@ define('Core/Commander/Providers/WMS_Provider', [
                 if (this.tileInsideLimit(tile,layer))
                 {
                     var bbox = tile.bbox;
-
-                    if(lookAtAncestor)
-                        paramMaterial.push({tileMT:0, pit:promises.length, visible:params[i].visible, opacity:params[i].opacity, fx:layer.fx, idLayer:layerWMSId[i]});
-
                     promises.push(this.getColorTexture(bbox,layerWMSId[i]));
-
                 }
             }
-
-            if (lookAtAncestor)
-                tile.setParamsColor(promises.length,paramMaterial);
 
             if (promises.length)
                 return when.all(promises);
@@ -153,11 +146,13 @@ define('Core/Commander/Providers/WMS_Provider', [
                 return when();
 
        };
+       
+
         
        WMS_Provider.prototype.getColorTexture = function(bbox, layerId) {
 
             //ATTENTION: pitch???
-            var result = {pitch : 0};
+            var result = {pitch : 1};
             var url = this.url(bbox,layerId);
 
             result.texture = this.cache.getRessource(url);
