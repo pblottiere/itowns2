@@ -44,7 +44,7 @@ define('Core/Commander/Providers/TileProvider', [
         BoundingBox
     ) {
 
-        function TileProvider(size,gLDebug) {
+        function TileProvider(size,manager,gLDebug) {
             //Constructor
 
             this.projection = new Projection();
@@ -55,6 +55,8 @@ define('Core/Commander/Providers/TileProvider', [
             this.providerWMS = new WMS_Provider({support :gLDebug});
             //this.providerElevationTexture = this.providerWMTS;
             //this.providerColorTexture = this.providerWMTS;
+
+            this.manager = manager;
 
             this.cacheGeometry = [];
             this.tree = null;
@@ -144,58 +146,76 @@ define('Core/Commander/Providers/TileProvider', [
             var elevationServices = map.elevationTerrain.services;
             var colorServices = map.colorTerrain.services;
 
-            tile.WMTSs = [];
+            tile.matrixSet = [];
 
             // TODO passer mes layers colors?
-            var paramsColorWMTS = [], paramsColorWMS = [];
 
-            var requests = [],
-                colorServicesWMTS = [],
-                colorServicesWMS   = [];
-            for (var i = 0; i < colorServices.length; i++)
+            var textureCount = 0;
+            var paramMaterial = [];
+            var providersColor = [];
+            var providerServices = [];
+
+            for (var i = 0; i < map.colorTerrain.children.length; i++)
             {
-                var layer = map.colorTerrain.children[i];
-                
-                var isLayerWMTS = this.providerWMTS.layersWMTS[colorServices[i]] !== undefined ? 1 : 0;
-                
-                if(isLayerWMTS) {
-                    
-                        var tileMT = this.providerWMTS.layersWMTS[colorServices[i]].tileMatrixSet;
 
-                        if(!tile.WMTSs[tileMT])
-                               tile.WMTSs[tileMT] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMT);
-                        colorServicesWMTS.push(colorServices[i]);
-                        paramsColorWMTS.push({visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0});
+                var layerView = map.colorTerrain.children[i];
+				var provider = this.manager.getProvider(layerView);
+                var service = layerView.services[0];
+                var layerService = provider.layersWMTS[service];
+                var tileMatrixSet = layerService.tileMatrixSet;
 
-                } else{ //wms
-                    
-                        /* TODO */
-                        
-                        colorServicesWMS.push(colorServices[i]);
-                        paramsColorWMS.push({visible:layer.visible ? 1 : 0,opacity:layer.opacity || 1.0});
+                if(!tile.matrixSet[tileMatrixSet])
+                    tile.matrixSet[tileMatrixSet] = this.projection.getCoordWMTS_WGS84(tile.tileCoord, tile.bbox,tileMatrixSet);
 
-                }           
+                // if you make specific things depending on provider
+                // if(provider instanceof WMTS_Provider)
+                //     console.log('is WMTS_Provider');
+
+                if (provider.tileInsideLimit(tile, layerService)) {
+
+                    var idProv = providersColor.indexOf(provider);
+                    if(idProv<0)
+                    {
+                        providersColor.push(provider);
+                        providerServices[providersColor.length-1] = [service];
+
+                    }
+                    else
+                        providerServices[idProv].push(service);
+
+                    var bcoord = tile.matrixSet[tileMatrixSet];
+
+                    paramMaterial.push({
+                        tileMT: tileMatrixSet,
+                        pit: textureCount,
+                        visible: map.colorTerrain.children[i].visible ? 1 : 0,
+                        opacity: map.colorTerrain.children[i].opacity || 1.0,
+                        fx: layerService.fx,
+                        idLayer: colorServices[i]
+                    });
+
+                    textureCount += bcoord[1].row - bcoord[0].row + 1;
+                }
             }
 
-            var requests = [
+            tile.setColorLayerParameters(paramMaterial );
+            tile.texturesNeeded += textureCount;
 
-                    this.providerWMTS.getElevationTexture(tile,elevationServices).then(function(terrain){
+            var requests = [this.providerElevationTexture.getElevationTexture(tile,elevationServices).then(function(terrain){
+                            this.setTextureElevation(terrain);}.bind(tile))];
 
-                        this.setTextureElevation(terrain);}.bind(tile)),
+            for (var key in providersColor)
+            {
+                requests.push(providersColor[key].getColorTextures(tile,providerServices[key]).then(function(colorTextures){
 
-                    this.providerWMTS.getColorTextures(tile,colorServicesWMTS,paramsColorWMTS).then(function(colorTextures){
+                        this.setTexturesLayer(colorTextures,1);}.bind(tile)));
+            }
 
-                        this.setTexturesLayer(colorTextures,1);}.bind(tile))
+            requests.push(this.getKML(tile));
 
-                    ,this.getKML(tile),
-
-                    this.providerWMS.getColorTextures(tile,colorServicesWMS,paramsColorWMS).then(function(colorTextures){
-
-                        this.setTexturesLayer(colorTextures,1);}.bind(tile))
-
-                ];
-
-            return when.all(requests);
+            return when.all(requests).then(function() {
+                return command.resolve(tile);
+            });
         };
 
         return TileProvider;

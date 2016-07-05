@@ -109,14 +109,11 @@ define('Globe/TileMesh', [
         this.material = null;
     };
 
-    TileMesh.prototype.setParamsColor = function(nbTexturesColor,paramsTextureColor) {
-
-        this.texturesNeeded += nbTexturesColor;
+    TileMesh.prototype.setColorLayerParameters = function(paramsTextureColor) {
         this.material.setParam(paramsTextureColor);
 
-        for (var l = 0; l < paramsTextureColor.length; l++)
-        {
-            this.layersColor.push({id:paramsTextureColor[l].idLayer,sequence:l});
+        for (var l = 0; l < paramsTextureColor.length; l++) {
+            this.layersColor.push(paramsTextureColor[l].idLayer);
         }
     };
     /**
@@ -342,11 +339,14 @@ define('Globe/TileMesh', [
 
     TileMesh.prototype.getIndexLayerColor = function(idLayer) {
 
-        for (var l = 0; l < this.layersColor.length; l++)
-            if(this.layersColor[l].id === idLayer)
-                return l;
+        // for (var l = 0; l < this.layersColor.length; l++)
+        //     if(this.layersColor[l] === idLayer)
+        //         return l;
 
-        return -1;
+        // return -1;
+
+        return this.layersColor.indexOf(idLayer);
+
     };
 
     TileMesh.prototype.removeLayerColor = function(idLayer) {
@@ -356,22 +356,9 @@ define('Globe/TileMesh', [
         if(id > -1)
         {
 
-            var nbTextures = this.material.nbLoadedTextures();
-            var iSeq = this.layersColor.sequence;
-            var sequence = [];
             this.layersColor.splice(id,1);
-
-            for (var l = 0; l < this.layersColor.length; l++)
-            {
-                if(this.layersColor[l].sequence > iSeq)
-                    this.layersColor[l].sequence--;
-
-                sequence.push(this.layersColor[l].sequence);
-            }
-
+            var nbTextures = this.material.nbLoadedTextures();
             this.material.removeLayerColor(id);
-            this.material.setSequence(sequence);
-
             this.texturesNeeded -= nbTextures - this.material.nbLoadedTextures();
         }
 
@@ -384,7 +371,7 @@ define('Globe/TileMesh', [
 
         var newSequence,layer;
 
-        if(sequence.length !== this.layersColor)
+        if(sequence.length !== this.layersColor.length)
         {
             newSequence = sequence.slice(0);
             var max = newSequence.length;
@@ -404,7 +391,7 @@ define('Globe/TileMesh', [
         for (var l = 0; l < newSequence.length; l++)
         {
             var index = this.getIndexLayerColor(newSequence[l]);
-            this.layersColor[index].sequence = l;
+            //this.layersColor[index].sequence = l;
             sequenceMaterial[l] = index ;
         }
 

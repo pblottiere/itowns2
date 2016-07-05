@@ -75,6 +75,11 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         return this.scene.managerCommand.getProvider(this.scene.getMap().tiles).providerWMTS;
     };
 
+    ApiGlobe.prototype.getWMSProvider = function()
+    {
+        return this.scene.managerCommand.getProvider(this.scene.getMap().tiles).providerWMS;
+    };
+
     /**
     * Adds an imagery layer to the map. The layer id must be unique amongst all layers already inserted. The protocol rules which parameters are then needed for the function.
     * @constructor
@@ -85,21 +90,17 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var map = this.scene.getMap();
         var manager = this.scene.managerCommand;
         var protocol = layer.protocol;
-        var providerWMTS, providerWMS;
-        
-        if(protocol.toLowerCase()=="wmts"){
-            providerWMTS = this.getWMTSProvider();
-            providerWMTS.addLayer(layer);
-            manager.addLayer(map.colorTerrain,providerWMTS);
-        }
-        
-        
-        if(protocol.toLowerCase()=="wms"){
-            providerWMS = manager.getProvider(map.tiles).providerWMS;
-            providerWMS.addLayer(layer);
-            manager.addLayer(map.colorTerrain,providerWMS);
-        }    
-        map.addColorLayer(layer.id);
+        var provider;
+
+        if(protocol.toLowerCase() === 'wmts')
+            provider = this.getWMTSProvider();
+        else if(protocol.toLowerCase() === 'wmts')
+            provider = this.getWMSProvider();
+
+        provider.addLayer(layer);
+        var colorLayer = map.addColorLayer(layer.id);
+        manager.addLayer(colorLayer,provider);
+
     };
 
     ApiGlobe.prototype.moveLayerUp = function(layer){
@@ -125,6 +126,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         if(this.scene.getMap().removeColorLayer(id))
         {
             this.getWMTSProvider().removeLayer(id);
+            eventLayerRemoved.layer = id;
             this.viewerDiv.dispatchEvent(eventLayerRemoved);
             this.scene.renderScene3D();
             return true;
@@ -226,8 +228,6 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var map = new Globe(this.scene.size,gLDebug);
 
         this.scene.add(map);
-
-
 
         //!\\ TEMP
         //this.scene.wait(0);

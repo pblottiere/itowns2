@@ -121,8 +121,13 @@ vec4 getParamLayers(int id)
     for (int layer = 0; layer < 8; layer++)
         if(layer == id)
             return paramLayers[layer];
+<<<<<<< HEAD
     
     return vec4(0.0,0.0,0.0,0.0);        
+=======
+
+    return vec4(0.0,0.0,0.0,0.0);
+>>>>>>> dev
 }
 
 vec2 getParamBLayers(int id)
@@ -131,7 +136,12 @@ vec2 getParamBLayers(int id)
     for (int layer = 0; layer < 8; layer++)
         if(layer == id)
             return paramBLayers[layer];
+<<<<<<< HEAD
     return vec2(0.0,0.0);        
+=======
+
+    return vec2(0.0,0.0);
+>>>>>>> dev
 }
 
 void main() {
