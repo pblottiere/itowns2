@@ -162,6 +162,9 @@ define('Core/Commander/Providers/TileProvider', [
 				var provider = this.manager.getProvider(layerView);
                 var service = layerView.services[0];
                 var layerData = provider.layersData[service];
+                
+                
+                
                 var tileMatrixSet = layerData.tileMatrixSet;
 
                 if(!tile.matrixSet[tileMatrixSet])
@@ -184,17 +187,26 @@ define('Core/Commander/Providers/TileProvider', [
                         providerServices[idProv].push(service);
 
                     var bcoord = tile.matrixSet[tileMatrixSet];
-
-                    paramMaterial.push({
-                        tileMT: tileMatrixSet,
-                        pit: textureCount,
-                        visible: map.colorTerrain.children[i].visible ? 1 : 0,
-                        opacity: map.colorTerrain.children[i].opacity || 1.0,
-                        fx: layerData.fx,
-                        idLayer: colorServices[i]
-                    });
-
-                    textureCount += bcoord[1].row - bcoord[0].row + 1;
+                    if(provider instanceof WMTS_Provider){
+                        paramMaterial.push({
+                            tileMT: tileMatrixSet,
+                            pit: textureCount,
+                            visible: map.colorTerrain.children[i].visible ? 1 : 0,
+                            opacity: map.colorTerrain.children[i].opacity || 1.0,
+                            fx: layerData.fx,
+                            idLayer: colorServices[i]
+                        });
+                        textureCount += bcoord[1].row - bcoord[0].row + 1;
+                    }else if(provider instanceof WMS_Provider){
+                        paramMaterial.push({
+                            tileMT: tileMatrixSet,
+                            pit: 1,
+                            visible: map.colorTerrain.children[i].visible ? 1 : 0,
+                            opacity: map.colorTerrain.children[i].opacity || 1.0,
+                            fx: layerData.fx,
+                            idLayer: colorServices[i]
+                        });
+                    }    
                 }
             }
 

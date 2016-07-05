@@ -40,7 +40,7 @@ define('Core/Commander/Providers/WMS_Provider', [
             this.ioDriverImage = new IoDriver_Image();
             this.ioDriverXML = new IoDriverXML();
             
-            this.layersWMS = [];
+            this.layersData = [];
             
             this._ready       = false;
         }
@@ -51,7 +51,7 @@ define('Core/Commander/Providers/WMS_Provider', [
         
         WMS_Provider.prototype.url = function(bbox,layerId) {
 
-            return this.customUrl(this.layersWMS[layerId].customUrl,bbox);
+            return this.customUrl(this.layersData[layerId].customUrl,bbox);
 
         };
 
@@ -67,8 +67,8 @@ define('Core/Commander/Providers/WMS_Provider', [
 
         WMS_Provider.prototype.removeLayer = function(idLayer)
         {
-            if(this.layersWMS[idLayer])
-                this.layersWMS[idLayer] = undefined;
+            if(this.layersData[idLayer])
+                this.layersData[idLayer] = undefined;
 
         };
 
@@ -97,7 +97,7 @@ define('Core/Commander/Providers/WMS_Provider', [
                 var maxZoom = layer.maxLevel;
                 var minZoom = layer.minLevel;
 
-                this.layersWMS[layer.id] = {
+                this.layersData[layer.id] = {
                     customUrl: newBaseUrl,
                     mimetype :  format,
                     crs :   crs,
@@ -105,7 +105,8 @@ define('Core/Commander/Providers/WMS_Provider', [
                     version : version, 
                     styleName : styleName,
                     zoom : {min:minZoom,max:maxZoom},
-                    fx : layer.fx || 0.0
+                    fx : layer.fx || 0.0,
+                    tileMatrixSet: 'WGS84G' //cet option pour prendre le parcours de wmts
                 };    
         };
 
@@ -129,7 +130,7 @@ define('Core/Commander/Providers/WMS_Provider', [
 
             for (var i = 0; i < layerWMSId.length; i++) {
 
-                var layer = this.layersWMS[layerWMSId[i]];
+                var layer = this.layersData[layerWMSId[i]];
 
                 if (this.tileInsideLimit(tile,layer))
                 {
