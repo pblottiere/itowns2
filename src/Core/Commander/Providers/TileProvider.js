@@ -26,7 +26,8 @@ define('Core/Commander/Providers/TileProvider', [
         'Core/Math/Ellipsoid',
         'Globe/BuilderEllipsoidTile',
         'Core/defaultValue',
-        'Scene/BoundingBox'
+        'Scene/BoundingBox',
+        'Core/Commander/Providers/GPX_Provider'
     ],
     function(
         when,
@@ -39,7 +40,8 @@ define('Core/Commander/Providers/TileProvider', [
         Ellipsoid,
         BuilderEllipsoidTile,
         defaultValue,
-        BoundingBox
+        BoundingBox,
+        GPX_Provider
     ) {
 
         function TileProvider(size,gLDebug) {
@@ -49,6 +51,7 @@ define('Core/Commander/Providers/TileProvider', [
             this.providerWMTS = new WMTS_Provider({support : gLDebug});
             this.ellipsoid = new Ellipsoid(size);
             this.providerKML = new KML_Provider(this.ellipsoid);
+            this.providerGPX = new GPX_Provider(this.ellipsoid);
             this.builder = new BuilderEllipsoidTile(this.ellipsoid,this.projection);
 
             this.providerElevationTexture = this.providerWMTS;
@@ -86,6 +89,13 @@ define('Core/Commander/Providers/TileProvider', [
 
         // 52.0.2739.0 dev (64-bit)
        // TileProvider.prototype.getKML= function(){
+
+       TileProvider.prototype.getGPX = function(url){
+
+           return this.providerGPX.parseGPX(url);
+
+       }
+
         TileProvider.prototype.getKML= function(tile){
 
             if(tile.link.layer.visible && tile.level  === 16)
@@ -106,7 +116,8 @@ define('Core/Commander/Providers/TileProvider', [
         };
 
         TileProvider.prototype.executeCommand = function(command) {
-
+            this.getGPX("http://rks1306w175.ign.fr/ULTRA2009.gpx");
+            //this.getGPX("C:\Users\vcoindet\Downloads\ULTRA2009.gpx");
             var bbox = command.paramsFunction.bbox;
 
             // TODO not generic
