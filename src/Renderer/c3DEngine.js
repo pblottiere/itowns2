@@ -174,7 +174,7 @@ define('Renderer/c3DEngine', [
         this.update = function() {
             this.camera.update();
             this.updateControl();
-            this.scene.wait();
+            this.scene.notifyChange();
             this.renderScene();
 
         }.bind(this);

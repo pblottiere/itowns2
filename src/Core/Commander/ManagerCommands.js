@@ -82,17 +82,15 @@ define('Core/Commander/ManagerCommands', [
 
             if (this.commandsLength() === 0)
             {
-                return Promise.resolve(0);
+                return Promise.resolve(true);
             }
 
             return Promise.all(this.arrayDeQueue(16))
-                .then(function () {
-                    // if (this.commandsLength() <= 16)
-                    this.scene.wait(1);
-                    // else
-                    //     this.scene.renderScene3D();
-                    return this.runAllCommands();
-                }.bind(this));
+                .then(function() {
+
+                    return false;
+
+                });
         };
 
         ManagerCommands.prototype.arrayDeQueue = function(number) {

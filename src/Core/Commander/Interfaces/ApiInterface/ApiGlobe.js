@@ -246,7 +246,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
     ApiGlobe.prototype.update = function() {
 
         //!\\ TEMP
-        this.scene.wait(0);
+        this.scene.step();
         //!\\ TEMP
 
     };

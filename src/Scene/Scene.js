@@ -50,8 +50,8 @@ define('Scene/Scene', [
 
     var instanceScene = null;
     var event = new Event('globe-built');
-    var NO_SUBDIVISE = 0;
-    var SUBDIVISE = 1;
+    var NO_SUBDIVIDE = 0;
+    var SUBDIVIDE = 1;
     var CLEAN = 2;
 
     function Scene(coordCarto,viewerDiv, debugMode,gLDebug) {
@@ -75,6 +75,7 @@ define('Scene/Scene', [
 
         this.gLDebug = gLDebug;
         this.gfxEngine = c3DEngine(this,positionCamera,viewerDiv, debugMode,gLDebug);
+        this.needsUpdate = true;
         this.browserScene = new BrowseTree(this.gfxEngine);
         this.cap = new Capabilities();
 
@@ -126,32 +127,8 @@ define('Scene/Scene', [
         return this.size;
     };
 
-    /**
-     *
-     * @returns {undefined}
-     */
-    Scene.prototype.quadTreeRequest = function(quadtree, process){
-
-        this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVISE);
-        this.managerCommand.runAllCommands().then(function()
-            {
-                if (this.managerCommand.isFree())
-                {
-                    this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVISE);
-                    if (this.managerCommand.isFree()){
-                        this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN)
-                        this.viewerDiv.dispatchEvent(event);
-
-                    }
-                }
-
-            }.bind(this));
-
-        this.renderScene3D();
-
-    };
-
     Scene.prototype.realtimeSceneProcess = function() {
+        // rename sceneUpdate/layerUpdate?
 
         for (var l = 0; l < this.layers.length; l++) {
             var layer = this.layers[l].node;
@@ -161,7 +138,7 @@ define('Scene/Scene', [
                 var sLayer = layer.children[sl];
 
                 if (sLayer instanceof Quadtree)
-                    this.browserScene.browse(sLayer, this.currentCamera(), process, NO_SUBDIVISE);
+                    this.browserScene.browse(sLayer, this.currentCamera(), process, NO_SUBDIVIDE);
                 else if (sLayer instanceof MobileMappingLayer)
                     this.browserScene.updateMobileMappingLayer(sLayer,this.currentCamera());
                 else if (sLayer instanceof Layer)
@@ -180,16 +157,45 @@ define('Scene/Scene', [
         this.gfxEngine.update();
     };
 
-    Scene.prototype.wait = function(timeWait) {
+    Scene.prototype.notifyChange = function() {
+        this.needsUpdate = true;
+    }
 
-        var waitTime = timeWait ? timeWait: 20;
+    Scene.prototype.runCommands = function() {
+        var quadtree = this.layers[0].node.tiles;
+        var process = this.layers[0].process;
 
-        this.realtimeSceneProcess();
+        this.managerCommand.runAllCommands().then(function() {
+            if(this.managerCommand.isFree()) {
+                // try subdividing if no other commands left
+                this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVIDE);
+                if (this.managerCommand.isFree()){
+                    // clean if no subdividing was necessary
+                    this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN)
+                    this.viewerDiv.dispatchEvent(event);
+                    // no more update is needed after clean
+                    this.needsUpdate = false;
+                }
+            }
+            this.needsUpdate |= !this.managerCommand.isFree();
+        }.bind(this));
+    }
 
-        window.clearInterval(this.timer);
+    Scene.prototype.step = function() {
 
-        this.timer = window.setTimeout(this.quadTreeRequest.bind(this), waitTime,this.layers[0].node.tiles, this.layers[0].process);
-    };
+        if(this.needsUpdate) {
+            // update layers
+            this.realtimeSceneProcess();
+
+            // run commands
+            this.runCommands();
+
+            // render scene
+            this.renderScene3D();
+        }
+
+        requestAnimationFrame(this.step.bind(this));
+    }
 
     /**
      */
@@ -216,7 +222,6 @@ define('Scene/Scene', [
             this.map = node;
             this.managerCommand.addMapProvider(node);
             nodeProcess = nodeProcess || new NodeProcess(this.currentCamera(), node.size);
-            //this.quadTreeRequest(node.tiles, nodeProcess);
 
         }
 
