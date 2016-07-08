@@ -41,19 +41,36 @@ define('Core/Commander/Providers/GPX_Provider', [
                 if (result === undefined)
                     return undefined;
 
-                console.log("  ");
+                //console.log("  ");
 
+
+                //getting the waypoint points
                 var wpt = [];
                 wpt = result.getElementsByTagName("wpt");
 
                 for (var i = 0; i < wpt.length; i++) {
 
-                    var ele = [];
-                    ele[i] = result.getElementsByTagName("ele")[i].childNodes[0].nodeValue;
+                    var ele_wpt = [];
+                    ele_wpt[i] = wpt[i].getElementsByTagName("ele")[0].childNodes[0].nodeValue;
 
-                    var coords = [];
-                    coords[0] = [wpt[i].attributes.lat.nodeValue,wpt[i].attributes.lon.nodeValue, ele[i]];
-                        console.log(coords[0]);
+                    var coords_wpt = [];
+                    coords_wpt[i] = [wpt[i].attributes.lat.nodeValue,wpt[i].attributes.lon.nodeValue, ele_wpt[i]];
+                        //console.log(coords_wpt);
+
+                }
+
+                //getting the track points
+                var trkpt = [];
+                trkpt = result.getElementsByTagName("trkpt");
+
+                for (var i = 0; i < trkpt.length; i++) {
+
+                    var ele_trkpt = [];
+                    ele_trkpt[i] = trkpt[i].getElementsByTagName("ele")[0].childNodes[0].nodeValue;
+
+                    var coords_trkpt = [];
+                    coords_trkpt[i] = [trkpt[i].attributes.lat.nodeValue,trkpt[i].attributes.lon.nodeValue, ele_trkpt[i]];
+                        //console.log(coords_trkpt);
 
                 }
             }.bind(this));

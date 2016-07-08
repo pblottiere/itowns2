@@ -90,21 +90,6 @@ define('Core/Commander/Providers/TileProvider', [
         // 52.0.2739.0 dev (64-bit)
        // TileProvider.prototype.getKML= function(){
 
-       TileProvider.prototype.getGPX = function(tile,url){
-           if(/*tile.link.layer.visible &&*/ tile.level  === 16)
-            {
-                return this.providerGPX.parseGPX(url).then(function (gpx){
-
-                    if(gpx && tile.link.children.indexOf(gpx) === -1)
-                    {
-                            tile.link.add(gpx);
-                            tile.content = gpx;
-                    }
-
-                }.bind(this));
-            }
-       };
-
         TileProvider.prototype.getKML= function(tile){
 
             if(tile.link.layer.visible && tile.level  === 16)
@@ -123,6 +108,21 @@ define('Core/Commander/Providers/TileProvider', [
                 }.bind(this));
             }
         };
+
+        TileProvider.prototype.getGPX = function(tile,url){
+           if(/*tile.link.layer.visible &&*/ tile.level  === 16)
+            {
+                return this.providerGPX.parseGPX(url).then(function (gpx){
+
+                    if(gpx && tile.link.children.indexOf(gpx) === -1)
+                    {
+                            tile.link.add(gpx);
+                            tile.content = gpx;
+                    }
+
+                }.bind(this));
+            }
+       };
 
         TileProvider.prototype.executeCommand = function(command) {
 
