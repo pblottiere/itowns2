@@ -240,10 +240,17 @@ define('Renderer/c3DEngine', [
             canvas: canvas,
             antialias: true,
             alpha: true,
+            context: GL,
             logarithmicDepthBuffer: this.gLDebug || !NOIE ? false : true
         });
+        //console.log("renderer.context", this.renderer.context);
+        console.log("renderer.context check");
+
+
         this.renderer.setPixelRatio(viewerDiv.devicePixelRatio);
+        console.log("renderer.size ", viewerDiv.clientWidth, viewerDiv.clientHeight);
         this.renderer.setSize(viewerDiv.clientWidth, viewerDiv.clientHeight);
+        console.log("renderer.size set");
         this.renderer.setClearColor(0x030508);
         this.renderer.autoClear = false;
         //this.viewerDiv.appendChild(canvas);
@@ -290,6 +297,7 @@ define('Renderer/c3DEngine', [
      * @returns {undefined}
      */
     c3DEngine.prototype.updateControl = function() {
+        console.log("c3DEngine.prototype.updateControl");
         var len = this.camera.position().length();
         var lim = this.size * 1.1;
 
