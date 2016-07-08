@@ -40,6 +40,8 @@ define('Core/Commander/ManagerCommands', [
             this.providerMap = {};
             this.history = null;
             this.eventsManager = new EventsManager();
+            this.currentCommandsCount = 0;
+            this.maxConcurrentCommands = 16;
 
             if(!scene)
                 throw new Error("Cannot instantiate ManagerCommands without scene");
@@ -77,42 +79,33 @@ define('Core/Commander/ManagerCommands', [
             return this.commandsLength()===0;
         };
 
-        ManagerCommands.prototype.runAllCommands = function() {
+        ManagerCommands.prototype.fillCommandPool = function() {
 
-
-            if (this.commandsLength() === 0)
-            {
-                return Promise.resolve(true);
-            }
-
-            return Promise.all(this.arrayDeQueue(16))
-                .then(function() {
-
-                    return false;
-
-                });
-        };
-
-        ManagerCommands.prototype.arrayDeQueue = function(number) {
-
-            var nT = number === undefined ? this.queueAsync.length : number;
-
-            var arrayTasks = [];
-
-            while (this.queueAsync.length > 0 && arrayTasks.length < nT) {
-                var command = this.deQueue();
-                if(command)
-                {
-
-                    // TEMP
-
-                    var providers = this.getProviders(command.layer);
-                    for (var i = 0; i < providers.length; i++)
-                        arrayTasks.push(providers[i].executeCommand(command));
+            var command;
+            var that = this;
+            function launchCommand(cmd) {
+                var providers = that.getProviders(cmd.layer);
+                for (var i = 0; i < providers.length; i++) {
+                    that.currentCommandsCount++;
+                    var p = providers[i].executeCommand(cmd);
+                    if(p) {
+                        p.then(function() {
+                            that.currentCommandsCount--;
+                        });
+                    } else {
+                        that.currentCommandsCount--;
+                    }
                 }
             }
 
-            return arrayTasks;
+            for(var i = this.currentCommandsCount; i < this.maxConcurrentCommands; i++) {
+                command = this.deQueue();
+                if(command){
+                    launchCommand(command);
+                }
+            }
+
+            return this.currentCommandsCount === 0;
         };
 
         ManagerCommands.prototype.getProviders = function(layer)
@@ -138,7 +131,7 @@ define('Core/Commander/ManagerCommands', [
 
             return providers;
 
-        }
+        };
 
 
         /**

@@ -112,7 +112,7 @@ define('Scene/Scene', [
 
     Scene.prototype.getEllipsoid = function(){
         return this.layers[0].node.ellipsoid;
-    }
+    };
 
     Scene.prototype.updateCamera = function() {
         for(var i = 0; i < this.layers.length; i++) {
@@ -158,28 +158,24 @@ define('Scene/Scene', [
     };
 
     Scene.prototype.notifyChange = function() {
-        this.needsUpdate = true;
-    }
+        if(!this.needsUpdate) {
+            this.needsUpdate = true;
+            requestAnimationFrame(this.step.bind(this));
+        }
+    };
 
     Scene.prototype.runCommands = function() {
         var quadtree = this.layers[0].node.tiles;
         var process = this.layers[0].process;
 
-        this.managerCommand.runAllCommands().then(function() {
-            if(this.managerCommand.isFree()) {
-                // try subdividing if no other commands left
-                this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVIDE);
-                if (this.managerCommand.isFree()){
-                    // clean if no subdividing was necessary
-                    this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN)
-                    this.viewerDiv.dispatchEvent(event);
-                    // no more update is needed after clean
-                    this.needsUpdate = false;
-                }
-            }
-            this.needsUpdate |= !this.managerCommand.isFree();
-        }.bind(this));
-    }
+        this.browserScene.browse(quadtree,this.currentCamera(), process, SUBDIVIDE);
+        var allDone = this.managerCommand.fillCommandPool();
+        if(allDone) {
+            this.browserScene.browse(quadtree,this.currentCamera(), process, CLEAN);
+            this.viewerDiv.dispatchEvent(event);
+            this.needsUpdate = false;
+        }
+    };
 
     Scene.prototype.step = function() {
 
@@ -192,10 +188,10 @@ define('Scene/Scene', [
 
             // render scene
             this.renderScene3D();
-        }
 
-        requestAnimationFrame(this.step.bind(this));
-    }
+            requestAnimationFrame(this.step.bind(this));
+        }
+    };
 
     /**
      */
