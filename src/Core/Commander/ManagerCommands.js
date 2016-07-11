@@ -141,7 +141,9 @@ define('Core/Commander/ManagerCommands', [
             while (this.queueAsync.length > 0) {
                 var cmd = this.queueAsync.peek();
                 var requester = cmd.requester;
-                if (cmd.earlyDropFunction && cmd.earlyDropFunction(cmd)) {
+                if (requester.disposed) {
+                    this.queueAsync.dequeue();
+                } else if (cmd.earlyDropFunction && cmd.earlyDropFunction(cmd)) {
                     while (requester.children.length > 0) {
                         var child = requester.children[0];
                         child.dispose();

@@ -103,6 +103,8 @@ define('Globe/TileMesh', [
 
     TileMesh.prototype.dispose = function() {
         // TODO à mettre dans node mesh
+        this.disposed = true;
+        this.disposeChildren();
         this.material.dispose();
         this.geometry.dispose();
         this.geometry = null;
