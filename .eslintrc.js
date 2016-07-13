@@ -17,5 +17,8 @@ module.exports = {
     // Stylistic rules
     "eol-last": "error",
     "no-trailing-spaces": "error",
+    "no-console": 0,
+    "no-undef": 0,
+    "no-unused-vars": 0,
   }
 }
