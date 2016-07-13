@@ -20,5 +20,14 @@ module.exports = {
     "no-console": 0,
     "no-undef": 0,
     "no-unused-vars": 0,
+    "no-trailing-spaces": 0,
+    "no-redeclare": 0,
+    "eol-last": 0,
+    "comma-dangle": 0,
+    "no-mixed-spaces-and-tabs": 0,
+    "no-extra-semi": 0,
+    "no-constant-condition": 0,
+    "no-dupe-keys": 0,
+    "no-empty": 0,
   }
 }

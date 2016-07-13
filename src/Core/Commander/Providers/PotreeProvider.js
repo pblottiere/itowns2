@@ -1,17 +1,21 @@
 define('Core/Commander/Providers/PotreeProvider',
-        ['THREE'],
-        function(THREE) {
+        ['THREE',
+        './Potree/POCLoader',
+        './Potree/PointCloudOctree'],
+        function(THREE,
+            POCLoader,
+            PointCloudOctree) {
 
     var sceneInstance  = null;
     var potreeInstance = null;
     var PotreeProvider = function (scene)
     {
-        this.loader = new Potree.POCLoader();
+        this.loader = new POCLoader();
         sceneInstance = scene;
 
         this.loader.load("resources/stereotest/cloud.js", function(geometry){
             var material = new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors } );
-            var pointcloud = new Potree.PointCloudOctree(geometry, material);
+            var pointcloud = new PointCloudOctree(geometry, material);
 
             var bottomLeft = new THREE.Vector3 (4201215.424138484, 171429.945145441, 4779294.873914789);
             pointcloud.position.copy(bottomLeft);
