@@ -3,9 +3,11 @@ define(['./PointAttributeNames','./PointAttributeTypes'], function(PointAttribut
 
 var PointAttribute = function(name, type, numElements){
 	this.name = name;
-	this.type = type; 
+	this.type = type;
 	this.numElements = numElements;
 	this.byteSize = this.numElements * this.type.size;
+	console.log("new PointAttribute with name: ");
+	console.log(this.name);
 };
 
 PointAttribute.POSITION_CARTESIAN = new PointAttribute(
@@ -29,23 +31,23 @@ PointAttribute.NORMAL_FLOATS = new PointAttribute(
 PointAttribute.FILLER_1B = new PointAttribute(
 		PointAttributeNames.FILLER,
 		PointAttributeTypes.DATA_TYPE_UINT8, 1);
-		
+
 PointAttribute.INTENSITY = new PointAttribute(
 		PointAttributeNames.INTENSITY,
-		PointAttributeTypes.DATA_TYPE_UINT16, 1);		
-		
+		PointAttributeTypes.DATA_TYPE_UINT16, 1);
+
 PointAttribute.CLASSIFICATION = new PointAttribute(
 		PointAttributeNames.CLASSIFICATION,
-		PointAttributeTypes.DATA_TYPE_UINT8, 1);	
-		
+		PointAttributeTypes.DATA_TYPE_UINT8, 1);
+
 PointAttribute.NORMAL_SPHEREMAPPED = new PointAttribute(
 		PointAttributeNames.NORMAL_SPHEREMAPPED,
-		PointAttributeTypes.DATA_TYPE_UINT8, 2);		
-		
+		PointAttributeTypes.DATA_TYPE_UINT8, 2);
+
 PointAttribute.NORMAL_OCT16 = new PointAttribute(
 		PointAttributeNames.NORMAL_OCT16,
-		PointAttributeTypes.DATA_TYPE_UINT8, 2);	
-		
+		PointAttributeTypes.DATA_TYPE_UINT8, 2);
+
 PointAttribute.NORMAL = new PointAttribute(
 		PointAttributeNames.NORMAL,
 		PointAttributeTypes.DATA_TYPE_FLOAT, 3);

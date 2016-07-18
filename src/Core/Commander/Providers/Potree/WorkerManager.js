@@ -7,6 +7,7 @@ define(['./utils'], function(utils){
     };
 
     WorkerManager.prototype.getWorker = function(){
+            console.log("WorkerManager.getWorker");
             var ww = this.instances.pop();
 
             if(ww === undefined){
@@ -24,9 +25,9 @@ define(['./utils'], function(utils){
 
     /**
      * urls point to WebWorker code.
-     * Code must not contain calls to importScripts, 
+     * Code must not contain calls to importScripts,
      * concatenation is done by this method.
-     * 
+     *
      */
     WorkerManager.fromUrls = function(urls){
 
@@ -46,7 +47,7 @@ define(['./utils'], function(utils){
 
             return new WorkerManager(code);
     };
-    
+
     return WorkerManager;
-    
+
 });

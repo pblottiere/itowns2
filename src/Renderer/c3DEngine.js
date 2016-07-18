@@ -14,7 +14,8 @@ define('Renderer/c3DEngine', [
     'Renderer/BasicMaterial',
     'Globe/Atmosphere',
     'Core/System/Capabilities',
-    'Core/Commander/Providers/PotreeProvider'
+    'Core/Commander/Providers/PotreeProvider',
+    'Core/Commander/Providers/GreyhoundProvider'
 ], function(
     THREE,
     GlobeControls,
@@ -23,7 +24,8 @@ define('Renderer/c3DEngine', [
     BasicMaterial,
     Atmosphere,
     Capabilities,
-    PotreeProvider) {
+    PotreeProvider,
+    GreyhoundProvider) {
 
     var instance3DEngine = null;
 
@@ -144,11 +146,16 @@ define('Renderer/c3DEngine', [
         this.pickingTexture.depthBuffer = true;
 
         this.potreeProvider = new PotreeProvider(this.scene3D);
+        this.greyhoundProvider = new GreyhoundProvider(this.scene3D);
 
         this.renderScene = function() {
             if ( this.potreeProvider.getPotree() ) {
                 this.potreeProvider.getPotree().update(this.camera.camera3D, this.renderer);
             }
+
+            //if ( this.greyhoundProvider.getObject() ) {
+            //    this.greyhoundProvider.getObject().update(this.camera.camera3D, this.renderer);
+            //}
 
             this.renderer.clear();
             this.renderer.setViewport(0, 0, this.width, this.height);
