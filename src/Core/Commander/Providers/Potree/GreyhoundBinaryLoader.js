@@ -137,6 +137,9 @@ GreyhoundBinaryLoader.prototype.parse = function(node, buffer){
 		bbOffset: [node.pcoGeometry.bbOffset.x, node.pcoGeometry.bbOffset.y, node.pcoGeometry.bbOffset.z],
 		scale: this.scale
 	};
+
+	console.log(message);
+
 	ww.postMessage(message, [message.buffer]);
 
 };

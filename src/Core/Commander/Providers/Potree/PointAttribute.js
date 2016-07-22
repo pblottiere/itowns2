@@ -6,8 +6,8 @@ var PointAttribute = function(name, type, numElements){
 	this.type = type;
 	this.numElements = numElements;
 	this.byteSize = this.numElements * this.type.size;
-	console.log("new PointAttribute with name: ");
-	console.log(this.name);
+	//console.log("new PointAttribute with name: ");
+	//console.log(this.name);
 };
 
 PointAttribute.POSITION_CARTESIAN = new PointAttribute(

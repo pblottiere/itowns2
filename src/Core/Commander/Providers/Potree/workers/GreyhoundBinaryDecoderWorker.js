@@ -1,6 +1,6 @@
 // http://jsperf.com/uint8array-vs-dataview3/3
 function CustomView(buffer) {
-    console.log("GreyhoundBinaryDecoderWorker.CustomView begin");
+    //console.log("GreyhoundBinaryDecoderWorker.CustomView begin");
 	this.buffer = buffer;
 	this.u8 = new Uint8Array(buffer);
 
@@ -31,7 +31,7 @@ function CustomView(buffer) {
 }
 
 function networkToNative(val) {
-    console.log("GreyhoundBinaryDecoderWorker.networkToNative begin");
+    //console.log("GreyhoundBinaryDecoderWorker.networkToNative begin");
     return ((val & 0x00FF) << 24) |
            ((val & 0xFF00) <<  8) |
            ((val >> 8)  & 0xFF00) |
@@ -39,7 +39,7 @@ function networkToNative(val) {
 }
 
 var decompress = function(schema, input, numPoints) {
-    console.log("GreyhoundBinaryDecoderWorker.decompress begin");
+    //console.log("GreyhoundBinaryDecoderWorker.decompress begin");
     var x = new Module.DynamicLASZip();
 
     var abInt = new Uint8Array(input);
@@ -114,8 +114,8 @@ onmessage = function(event){
 	for(var i = 0; i < pointAttributes.attributes.length; i++){
 		var pointAttribute = pointAttributes.attributes[i];
 
-		console.log("pointAttribute.name: ");
-		console.log(pointAttribute.name);
+		//console.log("pointAttribute.name: ");
+		//console.log(pointAttribute.name);
 		//if(pointAttribute.name === Potree.PointAttribute.POSITION_CARTESIAN.name){
 		if(pointAttribute.name === 0){
 			var buff = new ArrayBuffer(numPoints*4*3);
@@ -126,9 +126,9 @@ onmessage = function(event){
 				positions[3*j+1] = (cv.getUint32(offset + j*pointSize+4));
 				positions[3*j+2] = (cv.getUint32(offset + j*pointSize+8));
 
-				console.log("offset");
-				console.log(offset);
-				console.log(positions[3*j+0]);
+				//console.log("offset");
+				//console.log(offset);
+				//console.log(positions[3*j+0]);
 
 				tightBoxMin[0] = Math.min(tightBoxMin[0], positions[3*j+0]);
 				tightBoxMin[1] = Math.min(tightBoxMin[1], positions[3*j+1]);

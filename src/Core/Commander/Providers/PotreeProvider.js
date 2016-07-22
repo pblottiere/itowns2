@@ -26,6 +26,10 @@ define('Core/Commander/Providers/PotreeProvider',
             potreeInstance.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2 ));
             potreeInstance.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ),  Math.PI ));
 
+            console.log("PotreeProvider");
+            console.log(geometry);
+            console.log(pointcloud);
+
             potreeInstance.add(pointcloud);
 
             sceneInstance.add(potreeInstance);

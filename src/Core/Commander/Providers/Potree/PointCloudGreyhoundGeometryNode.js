@@ -6,7 +6,7 @@ var baseLoaded = false;
 
 PointCloudGreyhoundGeometryNode = function(
         name, pcoGeometry, boundingBox, scale, offset){
-    console.log("PointCloudGreyhoundGeometryNode.cst");
+    //console.log("PointCloudGreyhoundGeometryNode.cst");
 	this.id = PointCloudGreyhoundGeometryNode.IDCount++;
 	this.name = name;
 	this.index = parseInt(name.charAt(name.length-1));
@@ -48,7 +48,7 @@ PointCloudGreyhoundGeometryNode.prototype.getBoundingBox = function(){
 };
 
 PointCloudGreyhoundGeometryNode.prototype.getChildren = function(){
-    console.log("PointCloudGreyhoundGeometryNode.getChildren");
+    //console.log("PointCloudGreyhoundGeometryNode.getChildren");
 	var children = [];
 
 	for(var i = 0; i < 8; i++){
@@ -61,7 +61,7 @@ PointCloudGreyhoundGeometryNode.prototype.getChildren = function(){
 };
 
 PointCloudGreyhoundGeometryNode.prototype.getURL = function(){
-    console.log("PointCloudGreyhoundGeometryNode.getURL");
+    //console.log("PointCloudGreyhoundGeometryNode.getURL");
     //var material = viewer.getMaterial();
     var schema = this.pcoGeometry.schema;
 
@@ -95,13 +95,13 @@ PointCloudGreyhoundGeometryNode.prototype.getURL = function(){
 };
 
 PointCloudGreyhoundGeometryNode.prototype.addChild = function(child){
-    console.log("PointCloudGreyhoundGeometryNode.addChild");
+    //console.log("PointCloudGreyhoundGeometryNode.addChild");
 	this.children[child.index] = child;
 	child.parent = this;
 };
 
 PointCloudGreyhoundGeometryNode.prototype.load = function(){
-    console.log("PointCloudGreyhoundGeometryNode.load");
+    //console.log("PointCloudGreyhoundGeometryNode.load");
 	if(this.loading === true || this.loaded === true ||this.pcoGeometry.numNodesLoading > 3){
 		return;
 	}
@@ -117,13 +117,13 @@ PointCloudGreyhoundGeometryNode.prototype.load = function(){
 };
 
 PointCloudGreyhoundGeometryNode.prototype.loadPoints = function(){
-    console.log("PointCloudGreyhoundGeometryNode.loadPoints");
+    //console.log("PointCloudGreyhoundGeometryNode.loadPoints");
 	this.pcoGeometry.loader.load(this);
 };
 
 
 PointCloudGreyhoundGeometryNode.prototype.loadHierarchyThenPoints = function(){
-    console.log("PointCloudGreyhoundGeometryNode.loadHierarchyThenPoints");
+    //console.log("PointCloudGreyhoundGeometryNode.loadHierarchyThenPoints");
 	var node = this;
 
     //From Greyhound (Cartesian) ordering for the octree to default
@@ -145,7 +145,7 @@ PointCloudGreyhoundGeometryNode.prototype.loadHierarchyThenPoints = function(){
   };
 
   var parseChildrenCounts = function(base, parentName, stack) {
-    console.log("PointCloudGreyhoundGeometryNode.parseChildrenCounts");
+    //console.log("PointCloudGreyhoundGeometryNode.parseChildrenCounts");
     var keys = Object.keys(base);
     var child;
     var childName;
@@ -190,7 +190,7 @@ PointCloudGreyhoundGeometryNode.prototype.loadHierarchyThenPoints = function(){
 
 	// load hierarchy
 	var callback = function(node, greyhoundHierarchy){
-    console.log("PointCloudGreyhoundGeometryNode.loadHierarchy callback");
+    //console.log("PointCloudGreyhoundGeometryNode.loadHierarchy callback");
 		var decoded = [];
 		node.numPoints = greyhoundHierarchy.n;
         parseChildrenCounts(greyhoundHierarchy, node.name, decoded);
@@ -274,7 +274,7 @@ PointCloudGreyhoundGeometryNode.prototype.getNumPoints = function(){
 
 
 PointCloudGreyhoundGeometryNode.prototype.dispose = function(){
-    console.log("PointCloudGreyhoundGeometryNode.dispose");
+    //console.log("PointCloudGreyhoundGeometryNode.dispose");
 	if(this.geometry && this.parent != null){
 		this.geometry.dispose();
 		this.geometry = null;

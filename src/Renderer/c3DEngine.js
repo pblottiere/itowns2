@@ -145,17 +145,19 @@ define('Renderer/c3DEngine', [
         this.pickingTexture.texture.generateMipmaps = false;
         this.pickingTexture.depthBuffer = true;
 
-        this.potreeProvider = new PotreeProvider(this.scene3D);
+        //this.potreeProvider = new PotreeProvider(this.scene3D);
         this.greyhoundProvider = new GreyhoundProvider(this.scene3D);
 
         this.renderScene = function() {
-            if ( this.potreeProvider.getPotree() ) {
-                this.potreeProvider.getPotree().update(this.camera.camera3D, this.renderer);
-            }
-
-            //if ( this.greyhoundProvider.getObject() ) {
-            //    this.greyhoundProvider.getObject().update(this.camera.camera3D, this.renderer);
+            //if ( this.potreeProvider.getPotree() ) {
+            //    console.log("getPotree.update");
+            //    this.potreeProvider.getPotree().update(this.camera.camera3D, this.renderer);
             //}
+
+            if ( this.greyhoundProvider.getObject() ) {
+                console.log("getGreyhound.update");
+                this.greyhoundProvider.getObject().update(this.camera.camera3D, this.renderer);
+            }
 
             this.renderer.clear();
             this.renderer.setViewport(0, 0, this.width, this.height);
