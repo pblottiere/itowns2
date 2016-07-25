@@ -7,6 +7,7 @@
 define('Globe/Globe', [
     'Core/defaultValue',
     'Scene/Layer',
+    'Scene/PointCloud',
     'Scene/Quadtree',
     'Scene/SchemeTile',
     'Core/Math/MathExtented',
@@ -18,7 +19,7 @@ define('Globe/Globe', [
     'Core/Geographic/CoordCarto',
     'Renderer/BasicMaterial',
     'THREE'
-], function(defaultValue, Layer, Quadtree, SchemeTile, MathExt,
+], function(defaultValue, Layer, PointCloud, Quadtree, SchemeTile, MathExt,
     Ellipsoid, TileMesh, Atmosphere, Clouds, Capabilities,
     CoordCarto, BasicMaterial, THREE) {
 
@@ -44,6 +45,8 @@ define('Globe/Globe', [
         kml.visible = false;
 
         this.tiles = new Quadtree(TileMesh, this.SchemeTileWMTS(2), this.size, kml);
+
+        this.pointcloud = new PointCloud();
 
         // PROBLEM is not generic : elevationTerrain ,colorTerrain
         this.elevationTerrain = new Layer();
@@ -99,6 +102,8 @@ define('Globe/Globe', [
 
         this.add(this.tiles);
         this.add(this.batiments);
+        this.add(this.pointcloud);
+
         //this.add(this.layerWGS84Zup);
 
         if (this.atmosphere !== undefined && !this.gLDebug) {

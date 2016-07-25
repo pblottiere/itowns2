@@ -23,6 +23,7 @@ define('Scene/Scene', [
     'Scene/BrowseTree',
     'Scene/NodeProcess',
     'Scene/Quadtree',
+    'Scene/PointCloud',
     'Core/Geographic/CoordStars',
     'Core/defaultValue',
     'Scene/Layer',
@@ -41,6 +42,7 @@ define('Scene/Scene', [
         BrowseTree,
         NodeProcess,
         Quadtree,
+        PointCloud,
         CoordStars,
         defaultValue,
         Layer,
@@ -164,6 +166,8 @@ define('Scene/Scene', [
                     this.browserScene.browse(sLayer, this.currentCamera(), process, NO_SUBDIVISE);
                 else if (sLayer instanceof MobileMappingLayer)
                     this.browserScene.updateMobileMappingLayer(sLayer,this.currentCamera());
+                else if (sLayer instanceof PointCloud)
+                    sLayer.update( this.currentCamera().camera3D, this.gfxEngine.renderer );
                 else if (sLayer instanceof Layer)
                     this.browserScene.updateLayer(sLayer,this.currentCamera());
 
