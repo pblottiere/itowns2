@@ -44,6 +44,8 @@ and open the template in the editor.
                itowns.viewer.createSceneGlobe(initCenter, viewerDiv) ;
                //console.log(itowns.viewer.pickPosition());
 
+              itowns.viewer.addPointCloud("greyhound://192.168.1.12:5000/greyhound/");
+
               itowns.viewer.addImageryLayer({
                 protocol:   "wmts",
                 id:         "Ortho",

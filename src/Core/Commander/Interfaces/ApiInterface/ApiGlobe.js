@@ -9,6 +9,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
        'Core/Commander/Interfaces/EventsManager',
        'Scene/Scene',
        'Scene/Layer',
+       'Scene/PointCloud',
        'Scene/NodeProcess',
        'Globe/Globe',
        'Core/Commander/Providers/WMTS_Provider',
@@ -17,6 +18,7 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
            EventsManager,
            Scene,
            Layer,
+           PointCloud,
            NodeProcess,
            Globe,
            WMTS_Provider,
@@ -96,6 +98,19 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe', [
         var colorLayer = map.addColorLayer(layer.id)
         manager.addLayer(colorLayer,provider);
 
+    };
+
+    ApiGlobe.prototype.addPointCloud = function(url) {
+        var layers = this.scene.layers;
+        for ( var l = 0; l < layers.length; l++ ) {
+            var layer = layers[l].node;
+
+            for (var sl = 0; sl < layer.children.length; sl++) {
+                var sLayer = layer.children[sl];
+                if (sLayer instanceof PointCloud)
+                    sLayer.load(url);
+            }
+        }
     };
 
     ApiGlobe.prototype.moveLayerUp = function(layer){
